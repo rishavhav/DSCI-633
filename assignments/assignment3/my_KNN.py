@@ -5,7 +5,7 @@ from collections import Counter
 
 class my_KNN:
 
-    def __init__(self, n_neighbors=5, metric="minkowski", p=2):
+    def __init__(self, n_neighbors=5, metric="euclidean", p=2):
         # metric = {"minkowski", "euclidean", "manhattan", "cosine"}
         # p value only matters when metric = "minkowski"
         # notice that for "cosine", 1 is closest and -1 is furthest
@@ -35,7 +35,7 @@ class my_KNN:
             distances = [np.sum(np.abs(x-x2)) for x2 in self.X.to_numpy()]
 
         elif self.metric == "cosine":
-            distances = (1-(np.dot(x,x2)/(np.linalg.norm(x)*np.linalg.norm(x2))) for x2 in self.X.to_numpy())
+            distances =  [1 - (np.dot(x,x2)/(np.sqrt(np.sum(x**2))*np.sqrt(np.sum(x2**2)))) for x2 in self.X.to_numpy()]
 
         else:
             raise Exception("Unknown criterion.")
