@@ -1,4 +1,4 @@
-from my_NB_hint import my_NB
+from my_NB import my_NB
 import pandas as pd
 
 if __name__ == "__main__":
