@@ -23,13 +23,9 @@ class my_AdaBoost:
         #         print(self.classes_)
         k = len(self.classes_)
         n = len(y)
-        #         print(k)
-        #         print(n)
         w = np.array([1.0 / n] * n)
         labels = np.array(y)
         self.alpha = []
-        #         print("self.n_estimators")
-        #         print(self.n_estimators)
         for i in range(self.n_estimators):
             # Sample with replacement from X, with wprobability w
             sample = np.random.choice(n, n, p=w)
@@ -47,9 +43,6 @@ class my_AdaBoost:
             ## error = 22%
 
             ##66
-
-            #             print("asfafaf")
-            #             print("error of model {}".format(error))
             while error >= (1 - 1.0 / k):  # <66
                 #                 print("while runs")
                 w = np.array([1.0 / n] * n)
@@ -83,11 +76,10 @@ class my_AdaBoost:
 
             for i in range(len(w)):
                 if predictions[i] == y[i]:
-                    w[i] = w[i]/(2*(1-error))
+                    w[i]=w[i]/(2*(1-error))
 
                 else:
-                    w[i] = w[i]/(2(error))
-        #             print("w new is {}".format(w))
+                    w[i]=w[i]/(2*(error))
 
         #             # Update wi
         #             w[i] = w[i] * np.exp(alpha[i] * (np.not_equal(y, predictions[i])).astype(int))
@@ -98,10 +90,6 @@ class my_AdaBoost:
         #         # Normalize alpha
         self.alpha = self.alpha / np.sum(self.alpha)
 
-        #         print(self.alpha)
-        #         print("adasd")
-        # #         print(len(self.estimators))
-        #         print( self.alpha)
         return None
 
     def predict(self, X):
@@ -124,8 +112,10 @@ class my_AdaBoost:
             # "write your own code"
             total = 0
             for i in range(self.n_estimators):
-                total += ((self.estimators[i].predict(X) == label)*(self.alpha[i]))
+                total += ((self.alpha[i]) * (self.estimators[i].predict(X) == label))
             probs[label] = (total)
+
+
 
         probs = pd.DataFrame(probs, columns=self.classes_)
         return probs
