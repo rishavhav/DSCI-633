@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
+from pdb import set_trace
 
 class my_AdaBoost:
 
@@ -13,18 +14,101 @@ class my_AdaBoost:
         self.estimators = [deepcopy(self.base_estimator) for i in range(self.n_estimators)]
 
     def fit(self, X, y):
+
+        #         print(len(self.estimators))
         # X: pd.DataFrame, independent variables, float
         # y: list, np.array or pd.Series, dependent variables, int or str
-
+        #         print("test fit run")
         self.classes_ = list(set(list(y)))
+        #         print(self.classes_)
         k = len(self.classes_)
-        # write your code below
-        return
+        n = len(y)
+        #         print(k)
+        #         print(n)
+        w = np.array([1.0 / n] * n)
+        labels = np.array(y)
+        self.alpha = []
+        #         print("self.n_estimators")
+        #         print(self.n_estimators)
+        for i in range(self.n_estimators):
+            # Sample with replacement from X, with wprobability w
+            sample = np.random.choice(n, n, p=w)
+            # Train base classifier with sampled training data
+            sampled = X.iloc[sample]
+            sampled.index = range(len(sample))
+            self.estimators[i].fit(sampled, labels[sample])
+            predictions = self.estimators[i].predict(X)
+            #             print(predictions)
+            diffs = np.array(predictions) != y
+            # print(diffs)
+            # Compute error rate and alpha for estimator i
+            error = np.sum(diffs * w)
+
+            ## error = 22%
+
+            ##66
+
+            #             print("asfafaf")
+            #             print("error of model {}".format(error))
+            while error >= (1 - 1.0 / k):  # <66
+                #                 print("while runs")
+                w = np.array([1.0 / n] * n)
+                sample = np.random.choice(n, n, p=w)
+                # Train base classifier with sampled training data
+                sampled = X.iloc[sample]
+                sampled.index = range(len(sample))
+                self.estimators[i].fit(sampled, labels[sample])
+                predictions = self.estimators[i].predict(X)
+                diffs = np.array(predictions) != y
+                # Compute error rate and alpha for estimator i
+                error = np.sum(diffs * w)
+
+            #             # If one base estimator predicts perfectly,
+            #             # Use that base estimator only
+
+            if error == 0:
+                self.alpha = [1]
+                self.estimators = [self.estimators[i]]
+                break
+
+            #             # Compute alpha for estimator i (don't forget to use k for multi-class)
+            #             self.alpha.append("write your own code")
+
+            self.alpha.append((np.log((1 - error) / error)) / 2 + np.log(k-1))
+
+            #             self.estimators.append(self.estimators[i])
+
+            #             print("error of the estimator is {}".format(error))
+            #             print("w old is {}".format(w))
+
+            for i in range(len(w)):
+                if predictions[i] == y[i]:
+                    w[i] = w[i]/(2*(1-error))
+
+                else:
+                    w[i] = w[i]/(2(error))
+        #             print("w new is {}".format(w))
+
+        #             # Update wi
+        #             w[i] = w[i] * np.exp(alpha[i] * (np.not_equal(y, predictions[i])).astype(int))
+        #             w =(w * np.exp(alpha * (np.not_equal(y, predictions)).astype(int)))
+        #             for j in w :
+        #                 if()
+
+        #         # Normalize alpha
+        self.alpha = self.alpha / np.sum(self.alpha)
+
+        #         print(self.alpha)
+        #         print("adasd")
+        # #         print(len(self.estimators))
+        #         print( self.alpha)
+        return None
 
     def predict(self, X):
         # X: pd.DataFrame, independent variables, float
         # return predictions: list
-        # write your code below
+        probs = self.predict_proba(X)
+        predictions = [self.classes_[np.argmax(prob)] for prob in probs.to_numpy()]
         return predictions
 
     def predict_proba(self, X):
@@ -32,12 +116,17 @@ class my_AdaBoost:
         # prob: what percentage of the base estimators predict input as class C
         # prob(x)[C] = sum(alpha[j] * (base_model[j].predict(x) == C))
         # return probs = pd.DataFrame(list of prob, columns = self.classes_)
+        # Note that len(self.estimators) can sometimes be different from self.n_estimators
         # write your code below
+        probs = {}
+        for label in self.classes_:
+            # Calculate probs for each label
+            # "write your own code"
+            total = 0
+            for i in range(self.n_estimators):
+                total += ((self.estimators[i].predict(X) == label)*(self.alpha[i]))
+            probs[label] = (total)
 
-
+        probs = pd.DataFrame(probs, columns=self.classes_)
         return probs
-
-
-
-
 
