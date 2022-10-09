@@ -45,7 +45,6 @@ class my_KNN:
         # Return the stats of the labels of k nearest neighbors to a single input data point (np.array)
         # Output: Counter(labels of the self.n_neighbors nearest neighbors) e.g. {"Class A":3, "Class B":2}
         distances = self.dist(x)
-       
         return Counter([self.y[i] for i in np.argsort(distances)[0:5]])
        
 
@@ -72,8 +71,9 @@ class my_KNN:
             prob = {}            
             temp = dict(self.k_neighbors(x))
             for i in temp:
+              print(temp)
               temp[i] = temp[i] / sum(temp.values())
-            prob[max(temp, key=temp.get)] = max(temp.values())
+              prob[max(temp, key=temp.get)] = max(temp.values())
             probs.append(prob)
         probs = pd.DataFrame(probs, columns=self.classes_)
         
