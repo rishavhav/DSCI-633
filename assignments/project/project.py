@@ -21,11 +21,6 @@ class my_model():
     
 
     def fit(self, X, y):
-        text_data=X.select_dtypes(include="object")
-        text_data.drop(["location",'title', 'requirements'],axis=1,inplace=True)
-
-        for col in text_data.columns:
-            X["description"]=X["description"]+" "+X[col]
 
         def clean(text):
             text=text.lower()
@@ -56,10 +51,14 @@ class my_model():
         XX = pd.DataFrame(XX.toarray())
         ga = my_GA(SGDClassifier, XX, y, {"loss": ("hinge", "log_loss", "perceptron"), "penalty": ("l2", "l1"), "alpha": [0.0001, 0.01]}, self.obj_func, generation_size=50,
                    crossval_fold=5,
-                   max_generation=10, max_life=2)
+                    max_generation=10, max_life=2)
         best = ga.tune()[0]
         dec_dict = {key: best[i] for i, key in enumerate(["loss", "penalty", "alpha"])}
-        self.clf =  SGDClassifier()
+        self.clf =  SGDClassifier(alpha=0.001,
+                    class_weight={1:0.5, 0:0.5},
+                    eta0=10,
+                    learning_rate='adaptive',
+                    loss='perceptron', penalty='l2')
         self.clf.fit(XX,y)
         return
 
